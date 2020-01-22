@@ -1,0 +1,38 @@
+﻿<Window x:Class="MongoPie.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MongoPie"
+        mc:Ignorable="d"
+        Title="MongoPie" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="spLogin" Grid.Column="0" Visibility="Visible">
+            <Label>服务器地址</Label>
+            <TextBox Margin="5" Name="txtServerAddress"></TextBox>
+            <Label>端口</Label>
+            <TextBox Margin="5" Name="txtServerPort"></TextBox>
+            <Label>用户名</Label>
+            <TextBox Margin="5" Name="txtUserName"></TextBox>
+            <Label>密码</Label>
+            <PasswordBox local:PasswordBoxHelper.Attach="True" Margin="5" Name="txtPasswd"></PasswordBox>
+            <Label>数据库名称</Label>
+            <TextBox Margin="5" Name="txtDbName"></TextBox>
+            <Button Margin="5" Name="btnLogin" Click="btnLogin_Click">登录</Button>
+        </StackPanel>
+        <StackPanel Name="spStatus" Grid.Column="0" Visibility="Hidden">
+            <Button Margin="5" Name="btnLogOut" Click="btnLogOut_Click">断开连接</Button>
+            <TreeView x:Name="treeStatus" Margin="5 0 5 0">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Nodes}">
+                        <TextBlock Text="{Binding NodeName}"></TextBlock>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </StackPanel>
+    </Grid>
+</Window>
