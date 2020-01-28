@@ -36,6 +36,11 @@
                         <TextBlock Text="{Binding NodeDesc}"></TextBlock>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="FreshDB" Header="刷新" Click="FreshDB_Click"></MenuItem>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
             </TreeView>
         </DockPanel>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch">

@@ -15,9 +15,10 @@ namespace MongoPie.ViewModels
         {
             Results = new ObservableCollection<ResultItem>();
             Query = "{}";
-            Limit = 0;
+            Limit = 1000;
             Skip = 0;
             Projection = "{}";
+            Paging = new PagingInfo();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -106,6 +107,20 @@ namespace MongoPie.ViewModels
                 NotifyPropertyChanged();
             }
         }
+
+        public ObservableCollection<ResultItem> ResultsCache { get; set; }
+
+        private PagingInfo _paging { get; set; }
+        public PagingInfo Paging
+        {
+            get { return _paging; }
+            set
+            {
+                if (_paging == value) return;
+                _paging = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 
     public class DataBaseContext : INotifyPropertyChanged
@@ -166,6 +181,94 @@ namespace MongoPie.ViewModels
             {
                 if (_result == value) return;
                 _result = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+    }
+
+    public class PagingInfo : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] string PropertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        }
+
+        public PagingInfo()
+        {
+            CurrentPage = 1;
+            TotalCount = 0;
+            CountPerPage = 50;
+            StartIndex = 0;
+            EndIndex = 0;
+        }
+
+        private int _currentpage { get; set; }
+        public int CurrentPage
+        {
+            get
+            {
+                return _currentpage;
+            }
+            set
+            {
+                if (_currentpage == value) return;
+                _currentpage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _totalcount { get; set; }
+        public int TotalCount
+        {
+            get
+            {
+                return _totalcount;
+            }
+            set
+            {
+                if (_totalcount == value) return;
+                _totalcount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _countperpage { get; set; }
+        public int CountPerPage
+        {
+            get
+            {
+                return _countperpage;
+            }
+            set
+            {
+                if (_countperpage == value) return;
+                _countperpage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _startindex { get; set; }
+        public int StartIndex
+        {
+            get { return _startindex; }
+            set
+            {
+                if (_startindex == value) return;
+                _startindex = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _endindex { get; set; }
+        public int EndIndex
+        {
+            get { return _endindex; }
+            set
+            {
+                if (_endindex == value) return;
+                _endindex = value;
                 NotifyPropertyChanged();
             }
         }

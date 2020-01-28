@@ -143,7 +143,7 @@ namespace MongoPie
         /// <param name="context"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public IEnumerable<BsonDocument> Query(DataBaseContext context, BsonDocument filter)
+        public IEnumerable<BsonDocument> Query(DataBaseContext context, BsonDocument filter, FindOptions<BsonDocument> options = null)
         {
             if (!MongoClients.ContainsKey(context.ClientKey))
             {
@@ -152,9 +152,22 @@ namespace MongoPie
 
             var collection = MongoClients[context.ClientKey].GetDatabase(context.DbName).GetCollection<BsonDocument>(context.CollectionName);
 
-            var cursor = collection.Find<BsonDocument>(filter);
-            var result = cursor.ToList();
+            var cursor = collection.FindAsync<BsonDocument>(filter, options);
+            
+            var result = cursor.Result.ToList();
             return result;
+        }
+
+        public int GetCount(DataBaseContext context, BsonDocument filter, CountOptions options = null)
+        {
+            if (!MongoClients.ContainsKey(context.ClientKey))
+            {
+                throw new NullReferenceException("请先连接MongoDB!");
+            }
+
+            var collection = MongoClients[context.ClientKey].GetDatabase(context.DbName).GetCollection<BsonDocument>(context.CollectionName);
+            var count = collection.CountDocuments(filter, options);
+            return (int)count;
         }
     }
 }

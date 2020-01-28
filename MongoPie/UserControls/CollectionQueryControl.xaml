@@ -52,17 +52,114 @@
             </WrapPanel>
             <TabControl Grid.Row="2" Grid.ColumnSpan="2">
                 <TabItem Header="数据">
-                    <ListView x:Name="lvResult" ItemsSource="{Binding Results}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Result}"></TextBlock>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <ListView Grid.Row="1" x:Name="lvResult" ItemsSource="{Binding Results}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Result}" TextWrapping="NoWrap"></TextBlock>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" DataContext="{Binding Paging}">
+                            <Button Margin="5 5 0 5" Width="20" BorderBrush="White" ToolTip="跳转到第一页" Background="White" Name="btnMoveFirst" Click="btnMoveFirst_Click">
+                                <Button.Content>
+                                    <Canvas>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <RectangleGeometry Rect="-6,-6,2,12"></RectangleGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathGeometry.Figures>
+                                                        <PathFigure StartPoint="-4, 0" IsClosed="True">
+                                                            <LineSegment Point="6,-6"></LineSegment>
+                                                            <LineSegment Point="6, 6"></LineSegment>
+                                                        </PathFigure>
+                                                    </PathGeometry.Figures>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Button.Content>
+                            </Button>
+                            <Button Margin="0 5 0 5" Width="20" BorderBrush="White" ToolTip="跳转到前一页" Background="White" Name="btnMovePrevious" Click="btnMovePrevious_Click">
+                                <Button.Content>
+                                    <Canvas>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathGeometry.Figures>
+                                                        <PathFigure StartPoint="-5, 0" IsClosed="True">
+                                                            <LineSegment Point="5,-6"></LineSegment>
+                                                            <LineSegment Point="5, 6"></LineSegment>
+                                                        </PathFigure>
+                                                    </PathGeometry.Figures>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Button.Content>
+                            </Button>
+                            <Button Margin="0 5 0 5" Width="20" BorderBrush="White" ToolTip="跳转到后一页" Background="White" Name="btnMoveNext" Click="btnMoveNext_Click">
+                                <Button.Content>
+                                    <Canvas>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathGeometry.Figures>
+                                                        <PathFigure StartPoint="5, 0" IsClosed="True">
+                                                            <LineSegment Point="-5,-6"></LineSegment>
+                                                            <LineSegment Point="-5, 6"></LineSegment>
+                                                        </PathFigure>
+                                                    </PathGeometry.Figures>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Button.Content>
+                            </Button>
+                            <Button Margin="0 5 5 5" Width="20" BorderBrush="White" ToolTip="跳转到最后一页" Background="White" Name="btnMoveLast" Click="btnMoveLast_Click">
+                                <Button.Content>
+                                    <Canvas>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <RectangleGeometry Rect="4,-6,2,12"></RectangleGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                        <Path Stroke="Black" StrokeThickness="0" Fill="Gray">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathGeometry.Figures>
+                                                        <PathFigure StartPoint="4, 0" IsClosed="True">
+                                                            <LineSegment Point="-6,-6"></LineSegment>
+                                                            <LineSegment Point="-6, 6"></LineSegment>
+                                                        </PathFigure>
+                                                    </PathGeometry.Figures>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
+                                </Button.Content>
+                            </Button>
+                            <TextBox Name="txtCountPerPage" Margin="5" Width="60" VerticalContentAlignment="Center" Text="{Binding CountPerPage}" ToolTip="每页显示的记录数"></TextBox>
+                            <Label Margin="5" Padding="0" VerticalContentAlignment="Center" Content="{Binding CurrentPage}" ContentStringFormat="当前第{0}页"></Label>
+                            <Label Margin="5" Padding="0" VerticalContentAlignment="Center" Content="{Binding TotalCount}" ContentStringFormat="共{0}条数据"></Label>
+                            <Label Margin="5" Padding="0" VerticalContentAlignment="Center" Content="{Binding StartIndex}"></Label>
+                            <Label Margin="5" Padding="0" VerticalContentAlignment="Center" Content=" to "></Label>
+                            <Label Margin="5" Padding="0" VerticalContentAlignment="Center" Content="{Binding EndIndex}"></Label>
+                        </StackPanel>
+                    </Grid>
+                    
                 </TabItem>
                 <TabItem Header="消息">
-                    <TextBlock>
-                                Test Test Test
+                    <TextBlock Text="{Binding Message}">
+                                
                     </TextBlock>
                 </TabItem>
             </TabControl>

@@ -15,6 +15,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace MongoPie.UserControls
 {
@@ -42,28 +43,65 @@ namespace MongoPie.UserControls
         /// <param name="e"></param>
         private void btnQuery_Click(object sender, RoutedEventArgs e)
         {
-            int Count = viewmodel.Results.Count;
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine($"当前数据共{Count}条");
-            foreach (var g in viewmodel.Results)
-            {
-                builder.AppendLine(g.Result);
-            }
-            MessageBox.Show(builder.ToString());
+            //int Count = viewmodel.Results.Count;
+            //StringBuilder builder = new StringBuilder();
+            //builder.AppendLine($"当前数据共{Count}条");
+            //foreach (var g in viewmodel.Results)
+            //{
+            //    builder.AppendLine(g.Result);
+            //}
+            //MessageBox.Show(builder.ToString());
 
             // 创建约束生成器
-            FilterDefinitionBuilder<BsonDocument> filter = Builders<BsonDocument>.Filter;
-
-            var results = MongoClientService.Instance.Query(viewmodel.Context, filter.ToBsonDocument());
-
-            viewmodel.Results = new System.Collections.ObjectModel.ObservableCollection<ResultItem>();
-            foreach (var r in results)
+            try
             {
-                viewmodel.Results.Add(new ResultItem()
+                ShowMessage("开始查询。");
+                FilterDefinitionBuilder<BsonDocument> filter = Builders<BsonDocument>.Filter;
+
+                var countoptions = new CountOptions();
+                FindOptions<BsonDocument> options = new FindOptions<BsonDocument>();
+                if (viewmodel.Skip > 0)
                 {
-                    Result = r.ToJson()
-                });
+                    options.Skip = viewmodel.Skip;
+                    countoptions.Skip = viewmodel.Skip;
+                }
+
+                if (viewmodel.Limit > 0)
+                {
+                    options.Limit = viewmodel.Limit;
+                    countoptions.Limit = viewmodel.Limit;
+                }
+                var count = MongoClientService.Instance.GetCount(viewmodel.Context, filter.ToBsonDocument(), countoptions);
+
+                // 计算分页信息
+                viewmodel.Paging.CurrentPage = 1;
+                viewmodel.Paging.TotalCount = count;
+                viewmodel.Paging.StartIndex = (count > 0 && viewmodel.Paging.StartIndex <= count) ? (viewmodel.Paging.CurrentPage - 1) * viewmodel.Paging.CountPerPage + 1 : viewmodel.Paging.StartIndex;
+
+                // 查询
+                var results = MongoClientService.Instance.Query(viewmodel.Context, filter.ToBsonDocument(), options);
+                ShowMessage($"查询成功，共{results.Count()}条。");
+
+                // 处理
+                viewmodel.ResultsCache = new System.Collections.ObjectModel.ObservableCollection<ResultItem>();
+
+                foreach (var r in results)
+                {
+                    viewmodel.ResultsCache.Add(new ResultItem()
+                    {
+                        Result = r.ToJson()
+                    });
+                }
+
+                // end
+                viewmodel.Results = new ObservableCollection<ResultItem>(viewmodel.ResultsCache.Skip(viewmodel.Paging.StartIndex - 1).Take(viewmodel.Paging.CountPerPage));
+                viewmodel.Paging.EndIndex = viewmodel.Paging.StartIndex - 1 + viewmodel.Results.Count();
             }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
+            
         }
 
         /// <summary>
@@ -83,6 +121,94 @@ namespace MongoPie.UserControls
             {
                 Result = viewmodel.Query
             });
+        }
+
+        private void ShowMessage(string message)
+        {
+            viewmodel.Message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + " " + message + "\n" + viewmodel.Message;
+        }
+
+        /// <summary>
+        /// 跳转到前一页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnMovePrevious_Click(object sender, RoutedEventArgs e)
+        {
+            if(viewmodel.Paging.CurrentPage > 1)
+            {
+                viewmodel.Paging.CurrentPage -= 1;
+                viewmodel.Paging.StartIndex = viewmodel.Paging.StartIndex - viewmodel.Paging.CountPerPage <= 0 ? 1 : viewmodel.Paging.StartIndex - viewmodel.Paging.CountPerPage;
+                viewmodel.Results = new ObservableCollection<ResultItem>(viewmodel.ResultsCache.Skip(viewmodel.Paging.StartIndex - 1).Take(viewmodel.Paging.CountPerPage));
+                viewmodel.Paging.EndIndex = viewmodel.Paging.StartIndex - 1 + viewmodel.Results.Count();
+            }
+            else
+            {
+                MessageBox.Show("已经是第一页了");
+            }
+        }
+
+        /// <summary>
+        /// 跳转到后一页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnMoveNext_Click(object sender, RoutedEventArgs e)
+        {
+            if(viewmodel.Paging.EndIndex < viewmodel.Paging.TotalCount)
+            {
+                viewmodel.Paging.CurrentPage += 1;
+                viewmodel.Paging.StartIndex = viewmodel.Paging.EndIndex + 1 < viewmodel.Paging.TotalCount ? viewmodel.Paging.EndIndex + 1 : viewmodel.Paging.StartIndex;
+                viewmodel.Results = new ObservableCollection<ResultItem>(viewmodel.ResultsCache.Skip(viewmodel.Paging.StartIndex - 1).Take(viewmodel.Paging.CountPerPage));
+                viewmodel.Paging.EndIndex = viewmodel.Paging.StartIndex - 1 + viewmodel.Results.Count();
+
+            }
+            else
+            {
+                MessageBox.Show("已经是最后一页了");
+            }
+        }
+
+        /// <summary>
+        /// 跳转到最后一页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnMoveLast_Click(object sender, RoutedEventArgs e)
+        {
+            if(viewmodel.Paging.EndIndex < viewmodel.Paging.TotalCount)
+            {
+                viewmodel.Paging.CurrentPage = viewmodel.Paging.TotalCount / viewmodel.Paging.CountPerPage;
+                viewmodel.Paging.StartIndex = (viewmodel.Paging.CurrentPage * viewmodel.Paging.CountPerPage + 1) > viewmodel.Paging.TotalCount 
+                    ? (viewmodel.Paging.CurrentPage - 1) * viewmodel.Paging.CountPerPage + 1 
+                    : viewmodel.Paging.CurrentPage * viewmodel.Paging.CountPerPage + 1;
+                viewmodel.Results = new ObservableCollection<ResultItem>(viewmodel.ResultsCache.Skip(viewmodel.Paging.StartIndex - 1).Take(viewmodel.Paging.CountPerPage));
+                viewmodel.Paging.EndIndex = viewmodel.Paging.StartIndex - 1 + viewmodel.Results.Count();
+            }
+            else
+            {
+                MessageBox.Show("已经是最后一页了");
+            }
+        }
+
+        /// <summary>
+        /// 跳转到第一页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnMoveFirst_Click(object sender, RoutedEventArgs e)
+        {
+            if(viewmodel.Paging.CurrentPage > 1)
+            {
+                viewmodel.Paging.CurrentPage = 1;
+                viewmodel.Paging.StartIndex = 1;
+                viewmodel.Results = new ObservableCollection<ResultItem>(viewmodel.ResultsCache.Skip(viewmodel.Paging.StartIndex - 1).Take(viewmodel.Paging.CountPerPage));
+                viewmodel.Paging.EndIndex = viewmodel.Paging.StartIndex - 1 + viewmodel.Results.Count();
+            }
+            else
+            {
+                MessageBox.Show("已经是第一页了");
+            }
         }
     }
 }

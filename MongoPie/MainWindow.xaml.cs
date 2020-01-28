@@ -84,7 +84,11 @@ namespace MongoPie
             }
 
             MongoCredential credential = MongoCredential.CreateCredential(viewmodel.DbName, viewmodel.UserName, viewmodel.Pwd);
- 
+            if(string.IsNullOrEmpty(viewmodel.DbName) && string.IsNullOrEmpty(viewmodel.UserName) && string.IsNullOrEmpty(viewmodel.Pwd))
+            {
+                credential = null;
+            }
+
             MongoClientService.Instance.AddClient(viewmodel.DbKey, credential, new MongoServerAddress(viewmodel.ServerAddress, viewmodel.Port));
 
             this.spLogin.Visibility = Visibility.Hidden;
@@ -189,10 +193,21 @@ namespace MongoPie
         {
             var tree = sender as TreeView;
             var item = (NodeInfo)tree.SelectedItem;
+            if (item == null) return;
             if(item.NodeType == NodeType.Collection)
             {
                 AddItem(item);
             }
+        }
+
+        /// <summary>
+        /// 刷新当前数据库信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FreshDB_Click(object sender, RoutedEventArgs e)
+        {
+            GetDbInfo();
         }
     }
 }
