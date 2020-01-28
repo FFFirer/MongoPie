@@ -153,7 +153,6 @@ namespace MongoPie
             var collection = MongoClients[context.ClientKey].GetDatabase(context.DbName).GetCollection<BsonDocument>(context.CollectionName);
 
             var cursor = collection.FindAsync<BsonDocument>(filter, options);
-            
             var result = cursor.Result.ToList();
             return result;
         }

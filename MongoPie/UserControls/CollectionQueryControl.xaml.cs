@@ -16,6 +16,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Core;
 using System.Linq;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace MongoPie.UserControls
 {
@@ -43,23 +44,25 @@ namespace MongoPie.UserControls
         /// <param name="e"></param>
         private void btnQuery_Click(object sender, RoutedEventArgs e)
         {
-            //int Count = viewmodel.Results.Count;
-            //StringBuilder builder = new StringBuilder();
-            //builder.AppendLine($"当前数据共{Count}条");
-            //foreach (var g in viewmodel.Results)
-            //{
-            //    builder.AppendLine(g.Result);
-            //}
-            //MessageBox.Show(builder.ToString());
+            if (string.IsNullOrEmpty(viewmodel.Query))
+            {
+                viewmodel.Query = "{}";
+            }
 
-            // 创建约束生成器
+            if (string.IsNullOrEmpty(viewmodel.Projection))
+            {
+                viewmodel.Projection = "{}";
+            }
             try
             {
                 ShowMessage("开始查询。");
-                FilterDefinitionBuilder<BsonDocument> filter = Builders<BsonDocument>.Filter;
+
+                BsonDocument filter = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(viewmodel.Query);
+                BsonDocument projections = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(viewmodel.Projection);
 
                 var countoptions = new CountOptions();
                 FindOptions<BsonDocument> options = new FindOptions<BsonDocument>();
+
                 if (viewmodel.Skip > 0)
                 {
                     options.Skip = viewmodel.Skip;
@@ -71,7 +74,13 @@ namespace MongoPie.UserControls
                     options.Limit = viewmodel.Limit;
                     countoptions.Limit = viewmodel.Limit;
                 }
-                var count = MongoClientService.Instance.GetCount(viewmodel.Context, filter.ToBsonDocument(), countoptions);
+
+                if (projections.ElementCount > 0)
+                {
+                    options.Projection = projections;
+                }
+
+                var count = MongoClientService.Instance.GetCount(viewmodel.Context, filter, countoptions);
 
                 // 计算分页信息
                 viewmodel.Paging.CurrentPage = 1;
@@ -79,7 +88,7 @@ namespace MongoPie.UserControls
                 viewmodel.Paging.StartIndex = (count > 0 && viewmodel.Paging.StartIndex <= count) ? (viewmodel.Paging.CurrentPage - 1) * viewmodel.Paging.CountPerPage + 1 : viewmodel.Paging.StartIndex;
 
                 // 查询
-                var results = MongoClientService.Instance.Query(viewmodel.Context, filter.ToBsonDocument(), options);
+                var results = MongoClientService.Instance.Query(viewmodel.Context, filter, options);
                 ShowMessage($"查询成功，共{results.Count()}条。");
 
                 // 处理
@@ -100,6 +109,7 @@ namespace MongoPie.UserControls
             catch (Exception ex)
             {
                 ShowMessage(ex.Message);
+                MessageBox.Show(ex.Message);
             }
             
         }
@@ -122,7 +132,11 @@ namespace MongoPie.UserControls
                 Result = viewmodel.Query
             });
         }
-
+        
+        /// <summary>
+        /// 展示操作信息
+        /// </summary>
+        /// <param name="message"></param>
         private void ShowMessage(string message)
         {
             viewmodel.Message = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss fff") + " " + message + "\n" + viewmodel.Message;
