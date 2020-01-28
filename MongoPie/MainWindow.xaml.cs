@@ -17,6 +17,7 @@ using MongoDB;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
+using MongoPie;
 
 namespace MongoPie
 {
@@ -48,11 +49,11 @@ namespace MongoPie
             InitializeComponent();
             viewmodel = new MainViewModel() { 
                 Port = 27017,
-                ServerAddress = "115.159.223.241",
-                UserName= "AdminUser",
-                Pwd = "1qaz@WSX3edc",
-                DbName = "admin",
-                Dbs = new List<MainViewModel.NodeInfo>()
+                ServerAddress = "127.0.0.1",
+                UserName= "",
+                Pwd = "",
+                DbName = "",
+                Dbs = new List<NodeInfo>()
             };
             this.Loaded += (s, e) =>
             {
@@ -83,13 +84,8 @@ namespace MongoPie
             }
 
             MongoCredential credential = MongoCredential.CreateCredential(viewmodel.DbName, viewmodel.UserName, viewmodel.Pwd);
-            MongoClientSettings setting = new MongoClientSettings()
-            {
-                Credential = credential,
-                Server = new MongoServerAddress(viewmodel.ServerAddress, viewmodel.Port)
-            };
-
-            Client = new MongoClient(setting);
+ 
+            MongoClientService.Instance.AddClient(viewmodel.DbKey, credential, new MongoServerAddress(viewmodel.ServerAddress, viewmodel.Port));
 
             this.spLogin.Visibility = Visibility.Hidden;
             this.spStatus.Visibility = Visibility.Visible;
@@ -106,6 +102,7 @@ namespace MongoPie
         {
             this.spStatus.Visibility = Visibility.Hidden;
             this.spLogin.Visibility = Visibility.Visible;
+            viewmodel.Dbs = new List<NodeInfo>();
         }
 
         /// <summary>
@@ -124,38 +121,78 @@ namespace MongoPie
             this.txtPasswd.SetBinding(PasswordBoxHelper.PasswordProperty, new Binding("Pwd") { Source = viewmodel, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged});
         }
 
+        /// <summary>
+        /// 获取数据库所有database和collection
+        /// </summary>
         private void GetDbInfo()
         {
-            if(Client == null)
-            {
-                throw new NullReferenceException(nameof(Client));
-            }
+            viewmodel.Dbs = MongoClientService.Instance.GetDbInfo(viewmodel.DbKey);
+            
+            this.treeStatus.ItemsSource = viewmodel.Dbs;
+        }
 
-            // 获取所有database
-            using(var cursor = Client.ListDatabaseNames())
+        /// <summary>
+        /// 添加标签页
+        /// </summary>
+        /// <param name="Header"></param>
+        public void AddItem(NodeInfo node)
+        {
+            foreach(TabItem item in tcContainer.Items)
             {
-                List<string> databasenames = cursor.ToList();
-                int count = databasenames.Count();
-                viewmodel.Dbs.Add(new MainViewModel.NodeInfo()
+                
+                if(((TextBlock)item.Header).Text.ToString() == node.NodeName)
                 {
-                    Id = 0,
-                    NodeName = "databases",
-                    ParentId = -1,
-                    Nodes = new List<MainViewModel.NodeInfo>(0)
-                });
-                for (int i = 1; i < count; i++)
-                {
-                    viewmodel.Dbs[0].Nodes.Add(new MainViewModel.NodeInfo()
-                    {
-                        Id = i,
-                        NodeName = databasenames[i],
-                        ParentId = 0,
-                        Nodes = new List<MainViewModel.NodeInfo>()
-                    });
+                    item.IsSelected = true;
+                    return;
                 }
             }
 
-            this.treeStatus.ItemsSource = viewmodel.Dbs;
+            TabItem item2 = new TabItem()
+            {
+                Header = new TextBlock() { Text = node.NodeName, ToolTip = "右击选项卡关闭" },
+                Content = new UserControls.CollectionQueryControl()
+                {
+                    viewmodel = new CollectionQueryViewModel()
+                    {
+                        Context = new DataBaseContext()
+                        {
+                            DbName = node.DbName,
+                            CollectionName = node.NodeName,
+                            ClientKey = viewmodel.DbKey
+                        }
+                    }
+                }
+            };
+
+            item2.MouseRightButtonDown += tcContainerTabMouseRightDown;
+            this.tcContainer.Items.Add(item2);
+            item2.IsSelected = true;
+        }
+
+        /// <summary>
+        /// TabControl右键关闭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tcContainerTabMouseRightDown(object sender, EventArgs e)
+        {
+            TabItem item = sender as TabItem;
+            this.tcContainer.Items.Remove(item);
+        }
+
+        /// <summary>
+        /// TabControl添加Tab
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tcContainer_AddTab(object sender, MouseButtonEventArgs e)
+        {
+            var tree = sender as TreeView;
+            var item = (NodeInfo)tree.SelectedItem;
+            if(item.NodeType == NodeType.Collection)
+            {
+                AddItem(item);
+            }
         }
     }
 }
