@@ -59,7 +59,7 @@ namespace MongoPie.UserControls
         {
             if (LocalConnectionInfoManger.Instance.Remove(connection.ConnectionName))
             {
-                RemoveConnectionControl(connection.ConnectionName)
+                RemoveConnectionControl(connection.ConnectionName);
             }
         }
 
