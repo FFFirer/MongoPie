@@ -15,6 +15,8 @@ namespace MongoPie.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public Guid Id { get; set; }
+
         #region 登录信息
         private string _connectionname { get; set; }
         /// <summary>
@@ -121,6 +123,17 @@ namespace MongoPie.ViewModels
                 if (_password == value) return;
                 _password = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// ip:port
+        /// </summary>
+        public string ServerHost
+        {
+            get
+            {
+                return $"{ServerAddress}:{Port}";
             }
         }
         #endregion

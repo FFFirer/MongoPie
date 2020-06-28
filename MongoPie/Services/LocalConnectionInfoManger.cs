@@ -26,7 +26,7 @@ namespace MongoPie.Services
             return connections.ContainsKey(ConnectionName);
         }
 
-        public bool Add(ConnectionViewModel connection)
+        public bool Save(ConnectionViewModel connection)
         {
             if(!connections.ContainsKey(connection.ConnectionName))
             {
@@ -55,6 +55,25 @@ namespace MongoPie.Services
         internal List<ConnectionViewModel> GetAllConnections()
         {
             return connections.Values.ToList();
+        }
+    
+        internal ConnectionViewModel Query(string key)
+        {
+            if(connections[key] != null)
+            {
+                return connections[key];
+            }
+            else
+            {
+                GlobalExceptionHelper.Display(null, "连接不存在");
+                return null;
+            }
+        }
+
+        internal bool Update(ConnectionViewModel connection)
+        {
+            connections[connection.ConnectionName] = connection;
+            return true;
         }
     }
 }

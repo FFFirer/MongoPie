@@ -35,7 +35,7 @@ namespace MongoPie
 
             if (!string.IsNullOrEmpty(builder.ToString()))
             {
-                MessageBox.Show(builder.ToString(), "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(App.Current.MainWindow, builder.ToString(), "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }

@@ -19,7 +19,22 @@ namespace MongoPie.UserWindows
     /// </summary>
     public partial class ConnectionModifyWindow : Window
     {
-        public ConnectionViewModel ConnectionInfo { get; set; }
+        private ConnectionViewModel _connection { get; set; }
+        public ConnectionViewModel ConnectionInfo
+        {
+            get
+            {
+                return _connection;
+            }
+            set
+            {
+                if (_connection == value) return;
+                _connection = value;
+                BindProperty();
+            }
+        }
+
+        public bool IsUpdate { get; set; } = false;
         public bool IsSave { get; set; }
 
         public ConnectionModifyWindow()
@@ -42,6 +57,11 @@ namespace MongoPie.UserWindows
             }
         }
 
+        public void SetConnection(ConnectionViewModel connection)
+        {
+            this.ConnectionInfo = connection;
+        }
+
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             IsSave = false;
@@ -52,7 +72,7 @@ namespace MongoPie.UserWindows
         {
             if(ValidateConnectionInfo())
             {
-                MessageBox.Show("验证成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(App.Current.MainWindow, "验证成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -86,7 +106,8 @@ namespace MongoPie.UserWindows
             {
                 builder.AppendLine("请填写连接名称！");
             }
-            else if (LocalConnectionInfoManger.Instance.ExistConnectionName(ConnectionInfo.ConnectionName))
+
+            else if (LocalConnectionInfoManger.Instance.ExistConnectionName(ConnectionInfo.ConnectionName) && !IsUpdate)
             {
                 builder.AppendLine("连接名称已存在！");
             }
@@ -105,14 +126,22 @@ namespace MongoPie.UserWindows
                 builder.AppendLine("请填写服务器端口！");
             }
 
-            if(string.IsNullOrEmpty(ConnectionInfo.DatabaseName) || string.IsNullOrEmpty(ConnectionInfo.UserName) || string.IsNullOrEmpty(ConnectionInfo.Password))
+            if(string.IsNullOrEmpty(ConnectionInfo.DatabaseName) && string.IsNullOrEmpty(ConnectionInfo.UserName) && string.IsNullOrEmpty(ConnectionInfo.Password))
             {
-                builder.AppendLine("请全部指定数据库名称，用户名，密码，否则以不指定数据库，用户的状态尝试登录！");
+                
+            }
+            else if (!string.IsNullOrEmpty(ConnectionInfo.DatabaseName) && !string.IsNullOrEmpty(ConnectionInfo.UserName) && !string.IsNullOrEmpty(ConnectionInfo.Password))
+            {
+
+            }
+            else
+            {
+                builder.AppendLine("数据库名称，用户名，密码，全部填写或全部不填写！");
             }
 
             if(builder.ToString().Length > 0)
             {
-                MessageBox.Show(builder.ToString(), "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(App.Current.MainWindow, builder.ToString(), "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
             else

@@ -1,4 +1,6 @@
-﻿using MongoPie.ViewModels;
+﻿using MongoPie.Services;
+using MongoPie.UserWindows;
+using MongoPie.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,14 +34,14 @@ namespace MongoPie.UserControls
         public void SetViewModel(ConnectionViewModel viewModel)
         {
             this.viewModel = viewModel;
+            BindProperty();
         }
 
         public void BindProperty()
         {
             this.txbConnectionName.SetBinding(TextBlock.TextProperty, new Binding("ConnectionName") { Source = viewModel });
             this.txbUserName.SetBinding(TextBlock.TextProperty, new Binding("UserName") { Source = viewModel });
-            this.txbServerAddress.SetBinding(TextBlock.TextProperty, new Binding("Password") { Source = viewModel });
-
+            this.txbServerAddress.SetBinding(TextBlock.TextProperty, new Binding("ServerHost") { Source = viewModel });
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -49,12 +51,32 @@ namespace MongoPie.UserControls
 
         private void btnSetting_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("打开设置");
+            //MessageBox.Show("打开设置");
+            var connection = LocalConnectionInfoManger.Instance.Query(this.viewModel.ConnectionName);
+            if(connection != null)
+            {
+                ConnectionModifyWindow modifyWindow = new ConnectionModifyWindow();
+                modifyWindow.Owner = App.Current.MainWindow;
+                modifyWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                modifyWindow.IsUpdate = true;
+                modifyWindow.ConnectionInfo = connection;
+                modifyWindow.ShowDialog();
+                if (modifyWindow.IsSave)
+                {
+                    LocalConnectionInfoManger.Instance.Update(modifyWindow.ConnectionInfo);
+                    SetViewModel(modifyWindow.ConnectionInfo);
+                }
+            }
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("删除连接");
+            if(MessageBox.Show(App.Current.MainWindow, "将要删除连接？", "注意", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            {
+                RemoveConnectionEventHandler?.Invoke(this, null);
+            }
         }
+
+        public event EventHandler RemoveConnectionEventHandler;
     }
 }

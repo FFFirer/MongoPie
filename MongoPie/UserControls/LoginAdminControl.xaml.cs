@@ -31,46 +31,46 @@ namespace MongoPie.UserControls
         private void btnNewConnection_Click(object sender, RoutedEventArgs e)
         {
             ConnectionModifyWindow window = new ConnectionModifyWindow();
+            window.Owner = App.Current.MainWindow;
+            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.ShowDialog();
             if (window.IsSave)
             {
-                AddConnection(window.ConnectionInfo);
+                SaveConnection(window.ConnectionInfo);
             }
+        }
+
+        private void RemoveConnectionHandler(object sender, EventArgs e)
+        {
+            ConnectionPanelControl connectionPanel = (ConnectionPanelControl)sender;
+            if (LocalConnectionInfoManger.Instance.Remove(connectionPanel.viewModel.ConnectionName))
+            {
+                wpConnectionPanels.Children.Remove(connectionPanel);
+            }
+            MessageBox.Show("删除成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void AddConnectionControl(ConnectionViewModel connection)
         {
             // 展现到界面上
             ConnectionPanelControl connectionPanel = new ConnectionPanelControl();
+            connectionPanel.Margin = new Thickness(5, 5, 0, 0);
+            connectionPanel.Width = 150.0;
+            connectionPanel.Height = 100.0;
             connectionPanel.SetViewModel(connection);
-            //this.Dispatcher.Invoke(() =>
-            //{
-            //});
+            connectionPanel.RemoveConnectionEventHandler += RemoveConnectionHandler;
             wpConnectionPanels.Children.Add(connectionPanel);
-            wpConnectionPanels.RegisterName(connection.ConnectionName, connectionPanel);
+            //wpConnectionPanels.RegisterName(connection.ConnectionName, connectionPanel);
 
         }
 
-        private void AddConnection(ConnectionViewModel connection)
+        private void SaveConnection(ConnectionViewModel connection)
         {
             // 保存到数据里
-            if (LocalConnectionInfoManger.Instance.Add(connection))
+            if (LocalConnectionInfoManger.Instance.Save(connection))
             {
                 AddConnectionControl(connection);
             }
-        }
-
-        private void RemoveConnection(ConnectionViewModel connection)
-        {
-            if (LocalConnectionInfoManger.Instance.Remove(connection.ConnectionName))
-            {
-                RemoveConnectionControl(connection.ConnectionName);
-            }
-        }
-
-        private void RemoveConnectionControl(string controlName)
-        {
-            wpConnectionPanels.UnregisterName(controlName);
         }
 
         private void InitConnectionPanels()
