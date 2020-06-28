@@ -43,7 +43,12 @@ namespace MongoPie.UserControls
             // 展现到界面上
             ConnectionPanelControl connectionPanel = new ConnectionPanelControl();
             connectionPanel.SetViewModel(connection);
+            //this.Dispatcher.Invoke(() =>
+            //{
+            //});
+            wpConnectionPanels.Children.Add(connectionPanel);
             wpConnectionPanels.RegisterName(connection.ConnectionName, connectionPanel);
+
         }
 
         private void AddConnection(ConnectionViewModel connection)
