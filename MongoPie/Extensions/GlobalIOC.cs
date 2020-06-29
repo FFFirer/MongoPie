@@ -21,7 +21,7 @@ namespace MongoPie.Extensions
 
         public void AddServices()
         {
-            services.AddScoped<IMongoConnectionManager, LocalMongoConnectionManager>();
+            services.AddScoped<IMongoConnectionManager, SqliteMongoConnectionManager>();
         }
     }
 }
