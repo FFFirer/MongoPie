@@ -11,7 +11,7 @@
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" Name="btnNewConnection" Width="80" Content="添加新连接" HorizontalAlignment="Left" Height="20" Margin="5" Click="btnNewConnection_Click"></Button>
+        <Button Grid.Row="0" Name="btnNewConnection" Width="80" Content="添加新连接" HorizontalAlignment="Left" Height="20" Margin="5" Click="btnNewConnection_Click" BorderThickness="0" Background="SkyBlue" Foreground="White"></Button>
         <WrapPanel Grid.Row="1" Name="wpConnectionPanels">
             
         </WrapPanel>
