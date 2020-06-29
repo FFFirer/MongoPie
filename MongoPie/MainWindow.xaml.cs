@@ -71,7 +71,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 登录
+        /// [废弃]登录
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -104,7 +104,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 登出
+        /// [废弃]登出
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -116,7 +116,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 绑定
+        /// [废弃]绑定
         /// </summary>
         private void BindProperty()
         {
@@ -132,7 +132,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 获取数据库所有database和collection
+        /// [废弃]获取数据库所有database和collection
         /// </summary>
         private void GetDbInfo()
         {
@@ -142,7 +142,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 添加标签页
+        /// [废弃]添加标签页
         /// </summary>
         /// <param name="Header"></param>
         public void AddItem(NodeInfo node)
@@ -205,7 +205,7 @@ namespace MongoPie
                 Header = CreateTabGrid(tabName, connection.ConnectionName),
                 Content = new DatabaseControl()
                 {
-
+                    CurrentConnection = connection
                 }
             };
 
@@ -215,7 +215,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 右击关闭标签页
+        /// [废弃]右击关闭标签页
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -286,7 +286,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// TabControl右键关闭
+        /// [废弃]TabControl右键关闭
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -313,7 +313,7 @@ namespace MongoPie
         }
 
         /// <summary>
-        /// 刷新当前数据库信息
+        /// [废弃]刷新当前数据库信息
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

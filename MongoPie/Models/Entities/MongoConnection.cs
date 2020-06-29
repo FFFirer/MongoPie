@@ -13,5 +13,12 @@ namespace MongoPie.Models.Entities
         public string DatabaseName { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string DatabaseKey
+        {
+            get
+            {
+                return Id.ToString("N");
+            }
+        }
     }
 }

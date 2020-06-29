@@ -51,19 +51,24 @@ namespace MongoPie
             {
                 throw new ArgumentNullException(nameof(address));
             }
+            MongoClientSettings settings = new MongoClientSettings()
+            {
+                Server = address
+            };
+
+            if (credential != null)
+            {
+                settings.Credential = credential;
+            }
+            var client = new MongoClient(settings);
+
             if (!MongoClients.Keys.Contains(key))
             {
-                MongoClientSettings settings = new MongoClientSettings()
-                {
-                    Server = address
-                };
-
-                if (credential != null)
-                {
-                    settings.Credential = credential;
-                }
-                var client = new MongoClient(settings);
                 MongoClients.Add(key, client);
+            }
+            else
+            {
+                MongoClients[key] = client;
             }
         }
 
