@@ -18,6 +18,10 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
 using MongoPie;
+using MongoPie.UserControls;
+using MongoPie.Extensions;
+using MongoPie.Models.Entities;
+using System.Net.NetworkInformation;
 
 namespace MongoPie
 {
@@ -47,10 +51,10 @@ namespace MongoPie
         public MainWindow()
         {
             InitializeComponent();
-            viewmodel = new MainViewModel() { 
+            viewmodel = new MainViewModel() {
                 Port = 27017,
                 ServerAddress = "127.0.0.1",
-                UserName= "",
+                UserName = "",
                 Pwd = "",
                 DbName = "",
                 Dbs = new List<NodeInfo>()
@@ -62,6 +66,8 @@ namespace MongoPie
                 spLogin.Visibility = Visibility.Visible;
                 BindProperty();
             };
+
+            GlobalEventHandler.Instance.OpenDatabaseTabEvent += AddDatabaseTab;
         }
 
         /// <summary>
@@ -84,7 +90,7 @@ namespace MongoPie
             }
 
             MongoCredential credential = MongoCredential.CreateCredential(viewmodel.DbName, viewmodel.UserName, viewmodel.Pwd);
-            if(string.IsNullOrEmpty(viewmodel.DbName) && string.IsNullOrEmpty(viewmodel.UserName) && string.IsNullOrEmpty(viewmodel.Pwd))
+            if (string.IsNullOrEmpty(viewmodel.DbName) && string.IsNullOrEmpty(viewmodel.UserName) && string.IsNullOrEmpty(viewmodel.Pwd))
             {
                 credential = null;
             }
@@ -122,7 +128,7 @@ namespace MongoPie
 
             this.txtUserName.SetBinding(TextBox.TextProperty, new Binding("UserName") { Source = viewmodel });
 
-            this.txtPasswd.SetBinding(PasswordBoxHelper.PasswordProperty, new Binding("Pwd") { Source = viewmodel, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged});
+            this.txtPasswd.SetBinding(PasswordBoxHelper.PasswordProperty, new Binding("Pwd") { Source = viewmodel, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
         }
 
         /// <summary>
@@ -131,7 +137,7 @@ namespace MongoPie
         private void GetDbInfo()
         {
             viewmodel.Dbs = MongoClientService.Instance.GetDbInfo(viewmodel.DbKey);
-            
+
             this.treeStatus.ItemsSource = viewmodel.Dbs;
         }
 
@@ -141,10 +147,10 @@ namespace MongoPie
         /// <param name="Header"></param>
         public void AddItem(NodeInfo node)
         {
-            foreach(TabItem item in tcContainer.Items)
+            foreach (TabItem item in tcContainer.Items)
             {
-                
-                if(((TextBlock)item.Header).Text.ToString() == node.NodeName)
+
+                if (((TextBlock)item.Header).Text.ToString() == node.NodeName)
                 {
                     item.IsSelected = true;
                     return;
@@ -174,6 +180,112 @@ namespace MongoPie
         }
 
         /// <summary>
+        /// 添加数据库标签页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="tabName">Connection的GUID的无短划线字符串</param>
+        public void AddDatabaseTab(object sender, MongoConnection connection)
+        {
+            // 查看数据库对应的Tab是否已经打开
+            foreach (TabItem item in mainTab.Items)
+            {
+                if (item.Name == connection.Id.ToString("N") || item.Name == connection.ConnectionName)
+                {
+                    item.IsSelected = true;
+                    return;
+                }
+            }
+
+            string tabName = connection.Id == Guid.Empty || connection.Id == null ? $"tab{connection.ConnectionName}" : $"tab{connection.Id.ToString("N")}";
+
+            // 添加
+            TabItem dbTab = new TabItem()
+            {
+                Name = tabName,
+                Header = CreateTabGrid(tabName, connection.ConnectionName),
+                Content = new DatabaseControl()
+                {
+
+                }
+            };
+
+            //dbTab.MouseRightButtonUp += Tab_MouseRightButtonUp;
+            this.mainTab.Items.Add(dbTab);
+            dbTab.IsSelected = true;
+        }
+
+        /// <summary>
+        /// 右击关闭标签页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Tab_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TabItem item = sender as TabItem;
+            this.mainTab.Items.Remove(item);
+        }
+
+        /// <summary>
+        /// 创建tabheader的组件
+        /// </summary>
+        /// <param name="tabName"></param>
+        /// <returns></returns>
+        private Grid CreateTabGrid(string tabName, string tabHeader)
+        {
+            Grid tabGrid = new Grid();
+            tabGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+            tabGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(20.0) });
+            TextBlock tb = new TextBlock() { Text = tabHeader };
+            Grid.SetColumn(tb, 0);
+            Button btnClose = new Button()
+            {
+                Name = $"btn{tabName}",
+                Padding = new Thickness(3,0,3,0),
+                Content = "X",
+                Background = null,
+                BorderThickness = new Thickness(0),
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            btnClose.Click += BtnClose_Click;
+            Grid.SetColumn(btnClose, 1);
+            tabGrid.Children.Add(tb);
+            tabGrid.Children.Add(btnClose);
+
+            return tabGrid;
+        }
+
+        /// <summary>
+        /// 点击关闭按钮移除对应Tab页
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Button ClickedBtn = sender as Button;
+            string tabName = ClickedBtn.Name.Substring(3, ClickedBtn.Name.Length - 3);
+
+            var tab = ((System.Windows.FrameworkElement)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(ClickedBtn))).TemplatedParent;
+            if(tab.GetType() == typeof(TabItem))
+            {
+                this.mainTab.Items.Remove((TabItem)tab);
+                mainTab.SelectedIndex = 0;
+            }
+
+            //MessageBox.Show("未找到TabItem");
+
+            //foreach (var item in mainTab.Items)
+            //{
+            //    TabItem tab = item as TabItem;
+            //    if (tab.Name == tabName)
+            //    {
+            //        this.mainTab.Items.Remove(tab);
+            //        mainTab.SelectedIndex = 0;
+            //        return;
+            //    }
+            //}
+        }
+
+        /// <summary>
         /// TabControl右键关闭
         /// </summary>
         /// <param name="sender"></param>
@@ -194,7 +306,7 @@ namespace MongoPie
             var tree = sender as TreeView;
             var item = (NodeInfo)tree.SelectedItem;
             if (item == null) return;
-            if(item.NodeType == NodeType.Collection)
+            if (item.NodeType == NodeType.Collection)
             {
                 AddItem(item);
             }

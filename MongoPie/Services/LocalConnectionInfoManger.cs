@@ -6,6 +6,9 @@ using System.Text;
 
 namespace MongoPie.Services
 {
+    /// <summary>
+    /// 本地连接存储
+    /// </summary>
     public class LocalConnectionInfoManger
     {
         public static LocalConnectionInfoManger Instance { get; } = new LocalConnectionInfoManger();

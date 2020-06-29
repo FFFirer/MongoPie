@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:localuc="clr-namespace:MongoPie.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="200">
-    <Grid Name="gdConnection">
+             d:DesignHeight="100" d:DesignWidth="200" Background="AntiqueWhite">
+    <Grid Name="gdConnection" Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>

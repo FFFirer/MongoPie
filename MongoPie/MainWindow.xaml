@@ -76,7 +76,14 @@
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="连接名称" ToolTip="操作提示"></TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="20"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="连接名称" ToolTip="操作提示"></TextBlock>
+                        <Button Content="X" Grid.Column="1" Background="{x:Null}" BorderThickness="0" HorizontalAlignment="Right" Padding="3 0 3 0"></Button>
+                    </Grid>
                 </TabItem.Header>
                 <localuc:DatabaseControl></localuc:DatabaseControl>
             </TabItem>

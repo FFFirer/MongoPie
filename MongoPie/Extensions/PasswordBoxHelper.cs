@@ -6,6 +6,9 @@ using System.Windows.Controls;
 
 namespace MongoPie
 {
+    /// <summary>
+    /// Password 双向绑定
+    /// </summary>
     public static class PasswordBoxHelper
     {
         public static DependencyProperty PasswordProperty =

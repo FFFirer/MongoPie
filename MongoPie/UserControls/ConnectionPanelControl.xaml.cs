@@ -13,6 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MongoPie.Extensions;
+using MongoPie.Models.CustomEventArgs;
+using Microsoft.Extensions.DependencyInjection;
+using MongoPie.Models;
 
 namespace MongoPie.UserControls
 {
@@ -22,8 +26,6 @@ namespace MongoPie.UserControls
     public partial class ConnectionPanelControl : UserControl
     {
         public ConnectionViewModel viewModel { get; set; }
-
-        
 
         public ConnectionPanelControl()
         {
@@ -41,29 +43,37 @@ namespace MongoPie.UserControls
         {
             this.txbConnectionName.SetBinding(TextBlock.TextProperty, new Binding("ConnectionName") { Source = viewModel });
             this.txbUserName.SetBinding(TextBlock.TextProperty, new Binding("UserName") { Source = viewModel });
-            this.txbServerAddress.SetBinding(TextBlock.TextProperty, new Binding("ServerHost") { Source = viewModel });
+            this.txbServerAddress.SetBinding(TextBlock.TextProperty, new Binding("ServerAddress") { Source = viewModel });
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("打开连接");
+            //MessageBox.Show("打开连接");
+            GlobalEventHandler.Instance.OpenDatabaseTab(this, ModelConverter.ToMongoConnection(viewModel));
         }
 
         private void btnSetting_Click(object sender, RoutedEventArgs e)
         {
-            //MessageBox.Show("打开设置");
-            var connection = LocalConnectionInfoManger.Instance.Query(this.viewModel.ConnectionName);
-            if(connection != null)
+            // 传递GUID给设置窗口
+            if(viewModel.Id != null)
             {
+
                 ConnectionModifyWindow modifyWindow = new ConnectionModifyWindow();
                 modifyWindow.Owner = App.Current.MainWindow;
                 modifyWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 modifyWindow.IsUpdate = true;
-                modifyWindow.ConnectionInfo = connection;
+                if (viewModel.Id == Guid.Empty)
+                {
+                    MessageBox.Show("此连接未保存");
+                    modifyWindow.SetConnection(viewModel);
+                }
+                else
+                {
+                    modifyWindow.SetConnection(viewModel.Id);
+                }
                 modifyWindow.ShowDialog();
                 if (modifyWindow.IsSave)
                 {
-                    LocalConnectionInfoManger.Instance.Update(modifyWindow.ConnectionInfo);
                     SetViewModel(modifyWindow.ConnectionInfo);
                 }
             }

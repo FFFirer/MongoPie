@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver.Core.Events;
+using MongoPie.Extensions;
+using MongoPie.Models;
+using MongoPie.Models.Entities;
 using MongoPie.Services;
 using MongoPie.UserWindows;
 using MongoPie.ViewModels;
@@ -22,12 +27,20 @@ namespace MongoPie.UserControls
     /// </summary>
     public partial class LoginAdminControl : UserControl
     {
+        private IMongoConnectionManager _manager;
+
         public LoginAdminControl()
         {
             InitializeComponent();
-
+            _manager = GlobalIOC.Instance.serviceProvider.GetRequiredService<IMongoConnectionManager>();
+            InitConnectionPanels();
         }
 
+        /// <summary>
+        /// 添加新连接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnNewConnection_Click(object sender, RoutedEventArgs e)
         {
             ConnectionModifyWindow window = new ConnectionModifyWindow();
@@ -36,20 +49,30 @@ namespace MongoPie.UserControls
             window.ShowDialog();
             if (window.IsSave)
             {
-                SaveConnection(window.ConnectionInfo);
+                //SaveConnection(window.ConnectionInfo);
+                AddConnectionControl(window.ConnectionInfo);
             }
         }
 
+        /// <summary>
+        /// 从界面上移除连接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveConnectionHandler(object sender, EventArgs e)
         {
             ConnectionPanelControl connectionPanel = (ConnectionPanelControl)sender;
-            if (LocalConnectionInfoManger.Instance.Remove(connectionPanel.viewModel.ConnectionName))
+            if (_manager.Remove(connectionPanel.viewModel.Id))
             {
                 wpConnectionPanels.Children.Remove(connectionPanel);
             }
             MessageBox.Show("删除成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        /// <summary>
+        /// 添加连接到界面上
+        /// </summary>
+        /// <param name="connection"></param>
         private void AddConnectionControl(ConnectionViewModel connection)
         {
             // 展现到界面上
@@ -60,25 +83,31 @@ namespace MongoPie.UserControls
             connectionPanel.SetViewModel(connection);
             connectionPanel.RemoveConnectionEventHandler += RemoveConnectionHandler;
             wpConnectionPanels.Children.Add(connectionPanel);
-            //wpConnectionPanels.RegisterName(connection.ConnectionName, connectionPanel);
-
         }
 
+        /// <summary>
+        /// 保存连接
+        /// </summary>
+        /// <param name="connection"></param>
         private void SaveConnection(ConnectionViewModel connection)
         {
+            
             // 保存到数据里
-            if (LocalConnectionInfoManger.Instance.Save(connection))
+            if (_manager.Save(ModelConverter.ToMongoConnection(connection)))
             {
                 AddConnectionControl(connection);
             }
         }
 
+        /// <summary>
+        /// 初始化已有的连接
+        /// </summary>
         private void InitConnectionPanels()
         {
-            var connections = LocalConnectionInfoManger.Instance.GetAllConnections();
+            var connections = _manager.GetAllConnections().ToList();
             foreach (var connection in connections)
             {
-                AddConnectionControl(connection);
+                AddConnectionControl(ModelConverter.ToConnectionViewModel(connection));
             }
         }
     }

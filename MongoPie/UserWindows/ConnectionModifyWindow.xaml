@@ -9,20 +9,20 @@
     <Grid>
         <StackPanel Name="LoginInfo">
             <Label>连接名称</Label>
-            <TextBox Margin="5" Name="txtConnectinName"></TextBox>
+            <TextBox TabIndex="0" Margin="5" Name="txtConnectinName"></TextBox>
             <Label>服务器地址</Label>
-            <TextBox Margin="5" Name="txtServerAddress"></TextBox>
+            <TextBox TabIndex="1" Margin="5" Name="txtHost"></TextBox>
             <Label>端口</Label>
-            <TextBox Margin="5" Name="txtServerPort"></TextBox>
-            <Label>用户名</Label>
-            <TextBox Margin="5" Name="txtUserName"></TextBox>
-            <Label>密码</Label>
-            <PasswordBox local:PasswordBoxHelper.Attach="True" Margin="5" Name="txtPasswd"></PasswordBox>
+            <TextBox TabIndex="2" Margin="5" Name="txtPort"></TextBox>
             <Label>数据库名称</Label>
-            <TextBox Margin="5" Name="txtDbName"></TextBox>
-            <Button Margin="5" Name="btnTestLogin" Click="btnTestLogin_Click">测试连接</Button>
-            <Button Margin="5" Name="btnSave" Click="btnSave_Click">保存</Button>
-            <Button Margin="5" Name="btnCancel" Click="btnCancel_Click">取消</Button>
+            <TextBox TabIndex="3" Margin="5" Name="txtDatabaseName"></TextBox>
+            <Label>用户名</Label>
+            <TextBox TabIndex="4" Margin="5" Name="txtUserName"></TextBox>
+            <Label>密码</Label>
+            <PasswordBox TabIndex="5" local:PasswordBoxHelper.Attach="True" Margin="5" Name="txtPassword"></PasswordBox>
+            <Button TabIndex="6" Margin="5" Name="btnTestLogin" Click="btnTestLogin_Click">测试连接</Button>
+            <Button TabIndex="7" Margin="5" Name="btnSave" Click="btnSave_Click">保存</Button>
+            <Button TabIndex="8" Margin="5" Name="btnCancel" Click="btnCancel_Click">取消</Button>
         </StackPanel>
     </Grid>
 </Window>

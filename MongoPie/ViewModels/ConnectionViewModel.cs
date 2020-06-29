@@ -15,6 +15,9 @@ namespace MongoPie.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <summary>
+        /// 唯一ID，由IDbConnectionManager的具体实现负责赋值
+        /// </summary>
         public Guid Id { get; set; }
 
         #region 登录信息
@@ -36,7 +39,6 @@ namespace MongoPie.ViewModels
             }
         }
 
-        private string _serveraddress { get; set; }
         /// <summary>
         /// 服务器地址
         /// </summary>
@@ -44,12 +46,24 @@ namespace MongoPie.ViewModels
         {
             get
             {
-                return _serveraddress;
+                return $"{_host}:{_port}";
+            }
+        }
+
+        private string _host { get; set; }
+        /// <summary>
+        /// IP 地址
+        /// </summary>
+        public string Host
+        {
+            get
+            {
+                return _host;
             }
             set
             {
-                if (_serveraddress == value) return;
-                _serveraddress = value;
+                if (_host == value) return;
+                _host = value;
                 NotifyPropertyChanged();
             }
         }
@@ -123,17 +137,6 @@ namespace MongoPie.ViewModels
                 if (_password == value) return;
                 _password = value;
                 NotifyPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// ip:port
-        /// </summary>
-        public string ServerHost
-        {
-            get
-            {
-                return $"{ServerAddress}:{Port}";
             }
         }
         #endregion
