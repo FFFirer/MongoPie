@@ -70,7 +70,7 @@ namespace MongoPie.UserWindows
                 {
                     IsSave = true;
                     ConnectionInfo = ModelConverter.ToConnectionViewModel(connection);
-                    MessageBox.Show("保存成功！");
+                    //MessageBox.Show("保存成功！");
                     this.Close();
                 }
                 else
@@ -82,7 +82,7 @@ namespace MongoPie.UserWindows
         }
 
         /// <summary>
-        /// 设置连接
+        /// 设置初始化连接
         /// </summary>
         /// <param name="connection"></param>
         public void SetConnection(ConnectionViewModel connection)

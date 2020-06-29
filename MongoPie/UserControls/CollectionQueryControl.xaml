@@ -46,8 +46,8 @@
                 <Button Width="50" Name="btnQuery" Click="btnQuery_Click" Margin="5">
                     查询
                 </Button>
-                <Button Width="120" Name="btnAdd" Click="btnAdd_Click" Margin="5">
-                    Insert Document
+                <Button Width="90" Name="btnAdd" Click="btnAdd_Click" Margin="5">
+                    插入 / Insert
                 </Button>
             </WrapPanel>
             <TabControl Grid.Row="2" Grid.ColumnSpan="2">

@@ -31,7 +31,7 @@
         <TabControl Name="queryContainer" Grid.Column="2" Margin="0">
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Start" ToolTip="右击选项卡标题关闭选项卡"></TextBlock>
+                    <TextBlock Text="主页" ToolTip="右击选项卡标题关闭选项卡"></TextBlock>
                 </TabItem.Header>
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" TextAlignment="Center">

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MongoPie"
         xmlns:localuc="clr-namespace:MongoPie.UserControls"
         mc:Ignorable="d"
-        Title="MongoPie" Height="450" Width="800" MinWidth="600" MinHeight="450">
+        Title="芒果派 / MongoPie" Height="450" Width="800" MinWidth="600" MinHeight="450">
     <Window.Resources>
         
     </Window.Resources>
@@ -14,78 +14,11 @@
         <TabControl x:Name="mainTab" Margin="5">
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Home"></TextBlock>
+                    <TextBlock Text="主页"></TextBlock>
                 </TabItem.Header>
                 <Grid>
                     <localuc:LoginAdminControl></localuc:LoginAdminControl>
                 </Grid>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="Old Start"></TextBlock>
-                </TabItem.Header>
-                <Grid Margin="0 0 0 5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="180"></ColumnDefinition>
-                        <ColumnDefinition Width="5"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Name="spLogin" Grid.Column="0" Visibility="Hidden">
-                        <Label>服务器地址</Label>
-                        <TextBox Margin="5" Name="txtServerAddress"></TextBox>
-                        <Label>端口</Label>
-                        <TextBox Margin="5" Name="txtServerPort"></TextBox>
-                        <Label>用户名</Label>
-                        <TextBox Margin="5" Name="txtUserName"></TextBox>
-                        <Label>密码</Label>
-                        <PasswordBox local:PasswordBoxHelper.Attach="True" Margin="5" Name="txtPasswd"></PasswordBox>
-                        <Label>数据库名称</Label>
-                        <TextBox Margin="5" Name="txtDbName"></TextBox>
-                        <Button Margin="5" Name="btnLogin" Click="btnLogin_Click">登录</Button>
-                    </StackPanel>
-                    <DockPanel Name="spStatus" Grid.Column="0" Visibility="Visible">
-                        <Button DockPanel.Dock="Top" Margin="5 0 5 0" Name="btnLogOut" Click="btnLogOut_Click">断开连接</Button>
-                        <TreeView x:Name="treeStatus" Margin="5 0 5 0" MouseDoubleClick="tcContainer_AddTab">
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
-                                    <TextBlock Text="{Binding NodeDesc}"></TextBlock>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                            <TreeView.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Name="FreshDB" Header="刷新" Click="FreshDB_Click"></MenuItem>
-                                </ContextMenu>
-                            </TreeView.ContextMenu>
-                        </TreeView>
-                    </DockPanel>
-                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch">
-                    </GridSplitter>
-                    <TabControl Name="tcContainer" Grid.Column="2" Margin="5 0 5 0">
-                        <TabItem>
-                            <TabItem.Header>
-                                <TextBlock Text="Start" ToolTip="右击选项卡标题关闭选项卡"></TextBlock>
-                            </TabItem.Header>
-                            <DockPanel>
-                                <TextBlock DockPanel.Dock="Top" TextAlignment="Center">
-                        Hello world!
-                                </TextBlock>
-                            </DockPanel>
-                        </TabItem>
-                    </TabControl>
-                </Grid>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="20"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="连接名称" ToolTip="操作提示"></TextBlock>
-                        <Button Content="X" Grid.Column="1" Background="{x:Null}" BorderThickness="0" HorizontalAlignment="Right" Padding="3 0 3 0"></Button>
-                    </Grid>
-                </TabItem.Header>
-                <localuc:DatabaseControl></localuc:DatabaseControl>
             </TabItem>
         </TabControl>
     </Grid>
