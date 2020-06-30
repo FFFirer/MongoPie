@@ -5,13 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:localuc="clr-namespace:MongoPie.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400">
+             d:DesignHeight="200" d:DesignWidth="400" Loaded="UserControl_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" Name="btnNewConnection" Width="80" Content="添加新连接" HorizontalAlignment="Left" Height="20" Margin="5" Click="btnNewConnection_Click" BorderThickness="0" Background="SkyBlue" Foreground="White"></Button>
+        <Button Grid.Row="0" Name="btnNewConnection" Width="80" Content="添加新连接" HorizontalAlignment="Left" Height="20" Margin="5" Click="btnNewConnection_Click" BorderThickness="0"></Button>
         <WrapPanel Grid.Row="1" Name="wpConnectionPanels">
             
         </WrapPanel>

@@ -33,7 +33,6 @@ namespace MongoPie.UserControls
         {
             InitializeComponent();
             _manager = GlobalIOC.Instance.serviceProvider.GetRequiredService<IMongoConnectionManager>();
-            InitConnectionPanels();
         }
 
         /// <summary>
@@ -109,6 +108,11 @@ namespace MongoPie.UserControls
             {
                 AddConnectionControl(ModelConverter.ToConnectionViewModel(connection));
             }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitConnectionPanels();
         }
     }
 }

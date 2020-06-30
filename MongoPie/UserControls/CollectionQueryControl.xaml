@@ -43,10 +43,10 @@
                 </Grid>
             </WrapPanel>
             <WrapPanel DockPanel.Dock="Top" Grid.Row="1">
-                <Button Width="50" Name="btnQuery" Click="btnQuery_Click" Margin="5" BorderThickness="0" Background="LightSkyBlue">
+                <Button Width="50" Name="btnQuery" Click="btnQuery_Click" Margin="5" BorderThickness="0">
                     查询
                 </Button>
-                <Button Width="90" Name="btnAdd" Click="btnAdd_Click" Margin="5" BorderThickness="0" Background="LightCoral">
+                <Button Width="90" Name="btnAdd" Click="btnAdd_Click" Margin="5" BorderThickness="0">
                     插入 / Insert
                 </Button>
             </WrapPanel>

@@ -20,9 +20,9 @@
             <TextBox TabIndex="4" Margin="5" Name="txtUserName"></TextBox>
             <Label>密码</Label>
             <PasswordBox TabIndex="5" local:PasswordBoxHelper.Attach="True" Margin="5" Name="txtPassword"></PasswordBox>
-            <Button TabIndex="6" Margin="5" Name="btnTestLogin" Click="btnTestLogin_Click" BorderThickness="0" Background="LightGreen">测试连接</Button>
-            <Button TabIndex="7" Margin="5" Name="btnSave" Click="btnSave_Click" BorderThickness="0" Background="LightSkyBlue">保存</Button>
-            <Button TabIndex="8" Margin="5" Name="btnCancel" Click="btnCancel_Click" Background="White">取消</Button>
+            <Button TabIndex="6" Height="20" Margin="5" Name="btnTestLogin" Click="btnTestLogin_Click" BorderThickness="0">测试连接</Button>
+            <Button TabIndex="7" Height="20" Margin="5" Name="btnSave" Click="btnSave_Click" BorderThickness="0">保存</Button>
+            <Button TabIndex="8" Height="20" Margin="5" Name="btnCancel" Click="btnCancel_Click" Background="White">取消</Button>
         </StackPanel>
     </Grid>
 </Window>
