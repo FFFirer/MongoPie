@@ -13,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MongoPie.UserWindows;
+using System.Linq;
 
 namespace MongoPie.UserControls
 {
@@ -185,6 +187,176 @@ namespace MongoPie.UserControls
             {
                 this.queryContainer.Items.Remove((TabItem)tab);
             }
+        }
+
+        #region database和collection的增删
+        /// <summary>
+        /// 新建数据库
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddNewDatabase_Click(NodeInfo node)
+        {
+            if (node.NodeType == NodeType.Database || node.NodeType == NodeType.Databases)
+            {
+                NewDatabaseWindow newDatabase = new NewDatabaseWindow(node);
+                newDatabase.Owner = App.Current.MainWindow;
+                newDatabase.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                newDatabase.CreateDatabaseAction = (name) => MongoClientService.Instance.CreateDatabase(CurrentConnection.DatabaseKey, name);
+                newDatabase.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("节点错误");
+            }
+        }
+
+        /// <summary>
+        /// 新建Collection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddNewCollection_Click(NodeInfo node)
+        {
+            if (node.NodeType == NodeType.Collection || node.NodeType == NodeType.Collections)
+            {
+                var currentDatabaseNames = viewModel.Dbs[0]
+                    .Nodes
+                    .Select(a => a.DbName)
+                    .ToList();
+                NewCollectionWindow newCollection = new NewCollectionWindow(currentDatabaseNames, node.DbName, async (db, collection) =>
+                {
+                    await MongoClientService.Instance.CreateCollection(CurrentConnection.DatabaseKey, db, collection);
+                });
+                newCollection.Owner = App.Current.MainWindow;
+                newCollection.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                newCollection.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("节点错误");
+            }
+        }
+        
+        /// <summary>
+        /// 删除Database
+        /// </summary>
+        /// <param name="node"></param>
+        public async void DropDatabase(NodeInfo node)
+        {
+            if (node.NodeType == NodeType.Database)
+            {
+                if(MessageBox.Show(App.Current.MainWindow,$"确定要删除Database: {node.DbName}?", "注意", MessageBoxButton.OKCancel, MessageBoxImage.Warning ) == MessageBoxResult.OK)
+                {
+                    await MongoClientService.Instance.DropDatabase(CurrentConnection.DatabaseKey, node.DbName);
+                    MessageBox.Show("删除成功");
+                }
+            }
+            else
+            {
+                MessageBox.Show("节点错误");
+            }
+        }
+
+        /// <summary>
+        /// 删除Collection
+        /// </summary>
+        /// <param name="node"></param>
+        public async void DropCollection(NodeInfo node)
+        {
+            if (node.NodeType == NodeType.Collection)
+            {
+                if (MessageBox.Show(App.Current.MainWindow, $"确定要删除Collection: {node.NodeName}?", "注意", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+                {
+                    await MongoClientService.Instance.DropCollection(CurrentConnection.DatabaseKey, node.DbName, node.NodeName);
+                    MessageBox.Show("删除成功");
+                }
+            }
+            else
+            {
+                MessageBox.Show("节点错误");
+            }
+        }
+        #endregion
+
+
+        private void treeStatus_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject source = e.OriginalSource as DependencyObject;
+            while (source != null && source.GetType() != typeof(TreeViewItem))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+
+            if(source != null)
+            {
+                TreeViewItem item = source as TreeViewItem;
+                
+                CreateContextMenu(item);
+            }
+        }
+
+
+        /// <summary>
+        /// 创建右键菜单
+        /// </summary>
+        /// <param name="item"></param>
+        private void CreateContextMenu(TreeViewItem item)
+        {
+
+            NodeInfo info = (NodeInfo)item.DataContext;
+
+            ContextMenu nodeMenu = new ContextMenu();
+            MenuItem freshItem = new MenuItem();
+            freshItem.Header = "刷新";
+            freshItem.Click += FreshDB_Click;
+            nodeMenu.Items.Add(freshItem);
+
+            if (info.NodeType == NodeType.Database || info.NodeType == NodeType.Databases)
+            {
+
+                //MenuItem addNewDbItem = new MenuItem();
+                //addNewDbItem.Header = "新建Database";
+                //addNewDbItem.Click += (sender, e)=> {
+                //    AddNewDatabase_Click(info);
+                //};
+                //nodeMenu.Items.Add(addNewDbItem);
+
+                if(info.NodeType == NodeType.Database)
+                {
+                    MenuItem dropDatabaseItem = new MenuItem();
+                    dropDatabaseItem.Header = "删除Database";
+                    dropDatabaseItem.Click += (sender, e) =>
+                    {
+                        DropDatabase(info);
+                    };
+                    nodeMenu.Items.Add(dropDatabaseItem);
+                }
+            }
+            if (info.NodeType == NodeType.Collection || info.NodeType == NodeType.Collections)
+            {
+
+                MenuItem addNewCollectionItem = new MenuItem();
+                addNewCollectionItem.Header = "新建Collection";
+                addNewCollectionItem.Click += (sender, e) =>
+                {
+                    AddNewCollection_Click(info);
+                };
+                nodeMenu.Items.Add(addNewCollectionItem);
+
+                if(info.NodeType == NodeType.Collection)
+                {
+                    var dropCollectionItem = new MenuItem();
+                    dropCollectionItem.Header = "删除Collection";
+                    dropCollectionItem.Click += (sender, e) =>
+                    {
+                        DropCollection(info);
+                    };
+                    nodeMenu.Items.Add(dropCollectionItem);
+                }
+            }
+
+            this.treeStatus.ContextMenu = nodeMenu;
         }
     }
 }

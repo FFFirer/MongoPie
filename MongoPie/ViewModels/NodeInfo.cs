@@ -11,15 +11,24 @@ namespace MongoPie.ViewModels
     {
         public int Id { get; set; }
         public string DbName { get; set; }
-        private string _nodename { get; set; }
         public string NodeName { get; set; }
         public NodeType NodeType { get; set; }
         public string NodeDesc
         {
             get
             {
-                if (NodeType == NodeType.Collection) return NodeName;
-                return $"{NodeName}({Nodes.Count})";
+                switch (NodeType) {
+                    case NodeType.Database:
+                        return NodeName;
+                    case NodeType.Databases:
+                        return $"{NodeName}({Nodes.Count})";
+                    case NodeType.Collection:
+                        return NodeName;
+                    case NodeType.Collections:
+                        return $"{NodeName}({Nodes.Count})";
+                    default:
+                        return NodeName;
+                }
             }
         }
         public int ParentId { get; set; }

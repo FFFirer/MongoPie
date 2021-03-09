@@ -104,6 +104,9 @@ namespace MongoPie.UserControls
         private void InitConnectionPanels()
         {
             var connections = _manager.GetAllConnections().ToList();
+
+            // 每次切换到这个界面就会触发，清除所有重新加载
+            wpConnectionPanels.Children.Clear();    
             foreach (var connection in connections)
             {
                 AddConnectionControl(ModelConverter.ToConnectionViewModel(connection));

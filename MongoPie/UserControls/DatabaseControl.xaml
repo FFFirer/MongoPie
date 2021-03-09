@@ -13,9 +13,9 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <DockPanel Name="spStatus" Grid.Column="0" >
-            <TreeView x:Name="treeStatus" Margin="0" MouseDoubleClick="queryContainer_AddTab">
+            <TreeView x:Name="treeStatus" Margin="0" MouseDoubleClick="queryContainer_AddTab" PreviewMouseRightButtonDown="treeStatus_PreviewMouseRightButtonDown">
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
+                    <HierarchicalDataTemplate ItemsSource="{Binding Nodes}">
                         <TextBlock Text="{Binding NodeDesc}"></TextBlock>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>

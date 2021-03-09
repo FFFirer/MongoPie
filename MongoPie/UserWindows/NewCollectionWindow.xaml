@@ -1,0 +1,29 @@
+﻿<Window x:Class="MongoPie.UserWindows.NewCollectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MongoPie.UserWindows"
+        mc:Ignorable="d"
+        Title="新建Collection" Height="220" MinHeight="220" Width="400" MinWidth="400">
+    <Grid>
+        <Grid x:Name="gridMain">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="40"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                <Button Margin="0,0,10,0" Width="80" Name="btnConfirm" Click="btnConfirm_Click">确定</Button>
+                <Button Margin="0,0,10,0" Width="80" Name="btnCancel" Click="btnCancel_Click">取消</Button>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Margin="10" VerticalAlignment="Center">
+                <Label>数据库名称</Label>
+                <ComboBox IsEditable="True" ItemsSource="{Binding Databases}" x:Name="txtDatabaseName" Height="30" Text="{Binding DatabaseName}" VerticalContentAlignment="Center">
+
+                </ComboBox>
+                <Label>Collection名称</Label>
+                <TextBox x:Name="txtCollectionName" Height="30" Text="{Binding CollectionName}" VerticalContentAlignment="Center"></TextBox>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

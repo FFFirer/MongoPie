@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq;
 using MongoPie.ViewModels;
+using System.Threading.Tasks;
 
 namespace MongoPie
 {
@@ -172,6 +173,90 @@ namespace MongoPie
             var collection = MongoClients[context.ClientKey].GetDatabase(context.DbName).GetCollection<BsonDocument>(context.CollectionName);
             var count = collection.CountDocuments(filter, options);
             return (int)count;
+        }
+
+        /// <summary>
+        /// 创建数据库
+        /// </summary>
+        /// <param name="dbkey"></param>
+        /// <param name="databaseName"></param>
+        public void CreateDatabase(string dbkey, string databaseName)
+        {
+            var client = MongoClients[dbkey];
+            if(client == null)
+            {
+                throw new NullReferenceException($"{nameof(MongoClients)}中无所指定的client，请先创建");
+            }
+
+            var db = client.GetDatabase(databaseName);
+            if(db == null)
+            {
+                throw new MongoPieException("创建数据库失败");
+            }
+        }
+
+        /// <summary>
+        /// 删除数据库
+        /// </summary>
+        /// <param name="dbkey"></param>
+        /// <param name="databaseName"></param>
+        public Task DropDatabase(string dbkey, string databaseName)
+        {
+            var client = MongoClients[dbkey];
+            if(client == null)
+            {
+                throw new NullReferenceException($"{nameof(MongoClients)}中无所指定的client，请先创建");
+            }
+
+            return client.DropDatabaseAsync(databaseName);
+        }
+
+        /// <summary>
+        /// 创建Collection
+        /// </summary>
+        /// <param name="dbkey"></param>
+        /// <param name="databaseName"></param>
+        /// <param name="collectionName"></param>
+        public Task CreateCollection(string dbkey, string databaseName, string collectionName)
+        {
+
+            var client = MongoClients[dbkey];
+            if (client == null)
+            {
+                throw new NullReferenceException($"{nameof(MongoClients)}中无所指定的client，请先创建");
+            }
+
+            var db = client.GetDatabase(databaseName);
+            if (db == null)
+            {
+                throw new MongoPieException($"无法找到指定的数据库: {databaseName}");
+            }
+
+            return db.CreateCollectionAsync(collectionName);
+        }
+
+        /// <summary>
+        /// 删除Collection
+        /// </summary>
+        /// <param name="dbkey"></param>
+        /// <param name="databaseName"></param>
+        /// <param name="collectionName"></param>
+        /// <returns></returns>
+        public Task DropCollection(string dbkey, string databaseName, string collectionName)
+        {
+            var client = MongoClients[dbkey];
+            if (client == null)
+            {
+                throw new NullReferenceException($"{nameof(MongoClients)}中无所指定的client，请先创建");
+            }
+
+            var db = client.GetDatabase(databaseName);
+            if (db == null)
+            {
+                throw new MongoPieException($"无法找到指定的数据库: {databaseName}");
+            }
+
+            return db.DropCollectionAsync(collectionName);
         }
     }
 }
