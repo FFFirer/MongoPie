@@ -46,7 +46,7 @@
                 <Button Width="50" Name="btnQuery" Click="btnQuery_Click" Margin="5" BorderThickness="0">
                     查询
                 </Button>
-                <Button Width="90" Name="btnAdd" Click="btnAdd_Click" Margin="5" BorderThickness="0">
+                <Button Width="90" Name="btnAdd" Click="btnAdd_Click" Margin="5" BorderThickness="0" Visibility="Hidden">
                     插入 / Insert
                 </Button>
             </WrapPanel>

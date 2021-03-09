@@ -117,6 +117,7 @@ namespace MongoPie.UserControls
                 if(item.Name == CollectionKey)
                 {
                     item.IsSelected = true;
+                    return;
                 }
             }
 
@@ -279,7 +280,11 @@ namespace MongoPie.UserControls
         }
         #endregion
 
-
+        /// <summary>
+        /// 树形菜单右键
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void treeStatus_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             DependencyObject source = e.OriginalSource as DependencyObject;
